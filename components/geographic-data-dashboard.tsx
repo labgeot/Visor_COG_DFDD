@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useDeferredValue } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -36,52 +36,15 @@ import {
   Download,
   ExternalLink,
   ChevronDown,
+  X,
 } from "lucide-react"
+import { SearchResults } from "@/components/search-results"
+import { buildSearchIndex, searchIndex, type ObjetoRef } from "@/lib/search-utils"
+import type { AtributoDetalle, Categoria, Objeto, Subcategoria } from "@/lib/catalog-types"
 
 // Import the JSON data
 import catalogData from "@/data/catalogo-objetos-2025.json"
 import dbyFData from "../data/DByF_V2.0_IDERA_2022.json"
-
-interface Atributo {
-  codigo: string
-  denominacion: string
-}
-
-interface AtributoDetalle {
-  codigo: string
-  nombre: string
-  definicion: string
-  dominio: Array<{
-    codigo: number | string
-    etiqueta: string
-    definicion: string
-    observaciones: string
-  }> | null
-  tipo: string
-  observaciones: string
-}
-
-interface Objeto {
-  nombre: string
-  codigo: number
-  geometria: string
-  definicion: string
-  atributos: Atributo[]
-}
-
-interface Subcategoria {
-  nombre: string
-  codigo: number
-  contenido: string
-  objetos: Objeto[]
-}
-
-interface Categoria {
-  nombre: string
-  codigo: number
-  contenido: string
-  subcategorias: Subcategoria[]
-}
 
 const categoryColors = {
   1: {
@@ -231,6 +194,9 @@ export function GeographicDataDashboard() {
   const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategoria | null>(null)
   const [expandedDefinitions, setExpandedDefinitions] = useState<Set<number>>(new Set())
   const [atributos, setAtributos] = useState<AtributoDetalle[]>([])
+  // Objeto cuyo diálogo de atributos está abierto y atributo a resaltar dentro de él
+  const [openObjetoCodigo, setOpenObjetoCodigo] = useState<number | null>(null)
+  const [highlightAtributo, setHighlightAtributo] = useState<string | null>(null)
 
   const data = catalogData as Categoria[]
 
@@ -241,24 +207,26 @@ export function GeographicDataDashboard() {
       .catch((error) => console.error("Error loading atributos:", error))
   }, [])
 
+  // Índice de búsqueda global (se recalcula cuando llegan los detalles de atributos)
+  const searchIdx = useMemo(() => buildSearchIndex(data, atributos), [data, atributos])
+  const deferredSearchTerm = useDeferredValue(searchTerm)
+  const searchResults = useMemo(() => searchIndex(searchIdx, deferredSearchTerm), [searchIdx, deferredSearchTerm])
+
+  // Desplazar al atributo resaltado al abrir el diálogo
+  useEffect(() => {
+    if (openObjetoCodigo === null || !highlightAtributo) return
+    const t = setTimeout(() => {
+      document
+        .getElementById(`attr-${openObjetoCodigo}-${highlightAtributo}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" })
+    }, 150)
+    return () => clearTimeout(t)
+  }, [openObjetoCodigo, highlightAtributo, atributos])
+
   const getAtributoDetalle = (codigo: string): AtributoDetalle | null => {
     return atributos.find((attr) => attr.codigo === codigo) || null
   }
 
-  const getFilteredData = () => {
-    if (currentLevel === "categories") {
-      return data.filter((categoria) => categoria.nombre.toLowerCase().includes(searchTerm.toLowerCase()))
-    } else if (currentLevel === "subcategories" && selectedCategory) {
-      return selectedCategory.subcategorias.filter((subcategoria) =>
-        subcategoria.nombre.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
-    } else if (currentLevel === "objects" && selectedSubcategory) {
-      return selectedSubcategory.objetos.filter((objeto) =>
-        objeto.nombre.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
-    }
-    return []
-  }
 
   const getCategoryConfig = (codigo: number) => {
     return (
@@ -301,16 +269,57 @@ export function GeographicDataDashboard() {
     setSearchTerm("")
   }
 
-  const isDByF = (codigo: number): boolean => {
-    try {
-      return dbyFData.DByF.some((item: any) => {
-        const itemCode = Number.parseInt(item.Column5?.toString() || "0")
-        return itemCode === codigo
-      })
-    } catch (error) {
-      return false
+  /* ----------------------- Navegación desde la búsqueda ---------------------- */
+
+  const scrollToContent = () => {
+    document.getElementById("main-content")?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
+
+  const handleSearchSelectCategoria = (categoria: Categoria) => {
+    setSelectedSubcategory(null)
+    handleCategorySelect(categoria)
+    scrollToContent()
+  }
+
+  const handleSearchSelectSubcategoria = (categoria: Categoria, subcategoria: Subcategoria) => {
+    setSelectedCategory(categoria)
+    handleSubcategorySelect(subcategoria)
+    scrollToContent()
+  }
+
+  const handleSearchSelectObjeto = (ref: ObjetoRef, atributoCodigo?: string) => {
+    setSelectedCategory(ref.categoria)
+    setSelectedSubcategory(ref.subcategoria)
+    setCurrentLevel("objects")
+    setSearchTerm("")
+    setHighlightAtributo(atributoCodigo ?? null)
+    setOpenObjetoCodigo(ref.objeto.codigo)
+  }
+
+  const handleDialogOpenChange = (objeto: Objeto, open: boolean) => {
+    if (open) {
+      setHighlightAtributo(null)
+      setOpenObjetoCodigo(objeto.codigo)
+    } else {
+      setOpenObjetoCodigo(null)
+      setHighlightAtributo(null)
     }
   }
+
+  const dbyfCodes = useMemo(() => {
+    const set = new Set<number>()
+    try {
+      dbyFData.DByF.forEach((item: any) => {
+        const itemCode = Number.parseInt(item.Column5?.toString() || "0")
+        if (!Number.isNaN(itemCode)) set.add(itemCode)
+      })
+    } catch (error) {
+      // Sin datos DByF
+    }
+    return set
+  }, [])
+
+  const isDByF = (codigo: number): boolean => dbyfCodes.has(codigo)
 
   const toggleDefinition = (codigo: number) => {
     setExpandedDefinitions((prev) => {
@@ -478,7 +487,7 @@ export function GeographicDataDashboard() {
         </Card>
 
         {/* Main Content */}
-        <div className="space-y-6">
+        <div id="main-content" className="space-y-6 scroll-mt-40">
           {/* Navigation Controls */}
           <div className="flex items-center gap-4 mb-6">
             {currentLevel !== "categories" && (
@@ -491,26 +500,49 @@ export function GeographicDataDashboard() {
                 Volver
               </Button>
             )}
-            <div className="relative flex-1 max-w-md">
+            <div className="relative flex-1 max-w-xl">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder={
-                  currentLevel === "categories"
-                    ? "Buscar categorías..."
-                    : currentLevel === "subcategories"
-                      ? "Buscar subcategorías..."
-                      : "Buscar objetos..."
-                }
+                id="global-search-input"
+                type="search"
+                aria-label="Buscar en el catálogo"
+                placeholder="Buscar categorías, subcategorías, objetos o atributos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 border-gray-300"
+                onKeyDown={(e) => e.key === "Escape" && setSearchTerm("")}
+                className="pl-10 pr-10 border-gray-300 [&::-webkit-search-cancel-button]:hidden"
               />
+              {searchTerm && (
+                <button
+                  type="button"
+                  id="global-search-clear"
+                  aria-label="Limpiar búsqueda"
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
           </div>
 
-          {currentLevel === "categories" && (
+          {searchResults && (
+            <SearchResults
+              results={searchResults}
+              rawQuery={deferredSearchTerm.trim()}
+              getCategoryConfig={getCategoryConfig}
+              getGeometryType={getGeometryType}
+              getGeometryColor={getGeometryColor}
+              isDByF={isDByF}
+              onSelectCategoria={handleSearchSelectCategoria}
+              onSelectSubcategoria={handleSearchSelectSubcategoria}
+              onSelectObjeto={handleSearchSelectObjeto}
+            />
+          )}
+
+          {!searchResults && currentLevel === "categories" && (
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              {getFilteredData().map((categoria: Categoria) => {
+              {data.map((categoria: Categoria) => {
                 const config = getCategoryConfig(categoria.codigo)
                 const IconComponent = config.icon
                 const totalObjetos = categoria.subcategorias.reduce((acc, sub) => acc + sub.objetos.length, 0)
@@ -536,7 +568,7 @@ export function GeographicDataDashboard() {
             </div>
           )}
 
-          {currentLevel === "subcategories" && selectedCategory && (
+          {!searchResults && currentLevel === "subcategories" && selectedCategory && (
             <div className="space-y-4">
               <Card className="border-2 border-gray-300 shadow-sm bg-white">
                 <CardHeader>
@@ -559,7 +591,7 @@ export function GeographicDataDashboard() {
               </Card>
 
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                {getFilteredData().map((subcategoria: Subcategoria) => {
+                {selectedCategory.subcategorias.map((subcategoria: Subcategoria) => {
                   const config = getCategoryConfig(selectedCategory.codigo)
                   return (
                     <div
@@ -582,7 +614,7 @@ export function GeographicDataDashboard() {
             </div>
           )}
 
-          {currentLevel === "objects" && selectedSubcategory && (
+          {!searchResults && currentLevel === "objects" && selectedSubcategory && (
             <div className="space-y-4">
               <Card className="border-2 border-gray-300 shadow-sm bg-white">
                 <CardHeader>
@@ -597,7 +629,7 @@ export function GeographicDataDashboard() {
               </Card>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {getFilteredData().map((objeto: Objeto) => {
+                {selectedSubcategory.objetos.map((objeto: Objeto) => {
                   const geometryType = getGeometryType(objeto.geometria)
                   const objectSlug = `${objeto.codigo}-${objeto.nombre
                     .toLowerCase()
@@ -655,7 +687,10 @@ export function GeographicDataDashboard() {
                           )}
                         </div>
                         <div className="flex items-center justify-end mb-4">
-                          <Dialog>
+                          <Dialog
+                            open={openObjetoCodigo === objeto.codigo}
+                            onOpenChange={(open) => handleDialogOpenChange(objeto, open)}
+                          >
                             <DialogTrigger asChild>
                               <Button variant="outline" size="sm" className="flex items-center gap-2 bg-transparent">
                                 <FileText className="h-4 w-4" />
@@ -703,8 +738,19 @@ export function GeographicDataDashboard() {
                                   <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto">
                                     {objeto.atributos.map((atributo, index) => {
                                       const detalle = getAtributoDetalle(atributo.codigo)
+                                      const isHighlighted =
+                                        openObjetoCodigo === objeto.codigo &&
+                                        highlightAtributo === atributo.codigo?.trim()
                                       return (
-                                        <div key={index} className="p-3 bg-gray-50 rounded-md border border-gray-200">
+                                        <div
+                                          key={index}
+                                          id={`attr-${objeto.codigo}-${atributo.codigo?.trim()}`}
+                                          className={`p-3 rounded-md border transition-colors ${
+                                            isHighlighted
+                                              ? "bg-yellow-50 border-yellow-400 ring-2 ring-yellow-300"
+                                              : "bg-gray-50 border-gray-200"
+                                          }`}
+                                        >
                                           <div className="flex items-start gap-2 mb-2">
                                             <Badge variant="outline" className="border-gray-300 shrink-0">
                                               {atributo.codigo}
