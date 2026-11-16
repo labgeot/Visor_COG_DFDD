@@ -1,0 +1,11 @@
+node_modules/
+.pnpm-store/
+.next/
+out/
+.git/
+.env*
+*.md
+*.xlsx
+*.xlsm
+scripts/
+styles/

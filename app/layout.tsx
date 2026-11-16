@@ -5,9 +5,10 @@ import { GeistMono } from "geist/font/mono"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Catálogo de Objetos Geográficos IDERA",
-  description: "Dashboard interactivo para el catálogo de objetos geográficos de IDERA - Compatible con React 19.1.1",
-  generator: "Next.js + React 19",
+  title: "DGIWG Feature Data Dictionary (DFDD) — Baseline 2013-1.00",
+  description:
+    "Visualizador interactivo para el Defence Geospatial Information Working Group (DGIWG) Feature Data Dictionary (DFDD) Baseline 2013-1.00 — ISO 19126 / ISO 19135 / ISO 19110",
+  generator: "Next.js 14",
 }
 
 export default function RootLayout({

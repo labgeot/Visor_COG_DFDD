@@ -1,4 +1,5 @@
-import type { Atributo, AtributoDetalle, Categoria, Objeto, Subcategoria } from "./catalog-types"
+import React from "react"
+import type { AtributoDetalle, Categoria, Objeto, Subcategoria } from "./types"
 
 /* -------------------------------------------------------------------------- */
 /*                               Normalización                                */
@@ -57,6 +58,24 @@ export const getHighlightSegments = (text: string, query: string): HighlightSegm
   return segments
 }
 
+/** Resalta en JSX las coincidencias de `q` dentro de `text` preservando caracteres originales. */
+export const highlight = (text: string, q: string): React.ReactNode => {
+  const segments = getHighlightSegments(text, q)
+  return (
+    <>
+      {segments.map((s, i) =>
+        s.match ? (
+          <mark key={i} className="bg-yellow-200 text-black px-0.5 rounded-sm">
+            {s.text}
+          </mark>
+        ) : (
+          <React.Fragment key={i}>{s.text}</React.Fragment>
+        ),
+      )}
+    </>
+  )
+}
+
 /** Devuelve un fragmento del texto centrado en la primera coincidencia. */
 export const makeSnippet = (text: string, query: string, radius = 70): string => {
   if (!text) return ""
@@ -70,11 +89,20 @@ export const makeSnippet = (text: string, query: string, radius = 70): string =>
   return `${start > 0 ? "…" : ""}${text.slice(start, end)}${end < text.length ? "…" : ""}`
 }
 
+/** Genera un slug amigable para nombres de archivo o enlaces externos. */
+export const getObjectSlug = (codigo: string | number, nombre: string): string =>
+  `${codigo}-${nombre}`
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "")
+    .replace(/-+/g, "-")
+
 /* -------------------------------------------------------------------------- */
 /*                                   Índice                                   */
 /* -------------------------------------------------------------------------- */
 
-/** Campo buscable: etiqueta para mostrar al usuario, texto original y su versión normalizada. */
 interface Campo {
   etiqueta: string
   texto: string
@@ -88,9 +116,12 @@ const campo = (etiqueta: string, texto: unknown, peso: number): Campo => {
   return { etiqueta, texto: t, norm: normalize(t), peso }
 }
 
-export interface ObjetoRef {
+export interface SubgrupoRef {
   categoria: Categoria
   subcategoria: Subcategoria
+}
+
+export interface ObjetoRef extends SubgrupoRef {
   objeto: Objeto
 }
 
@@ -100,25 +131,30 @@ interface EntradaCategoria {
   categoria: Categoria
   campos: Campo[]
 }
-interface EntradaSubcategoria {
+
+interface EntradaSubcategoria extends SubgrupoRef {
   tipo: "subcategoria"
   key: string
-  categoria: Categoria
-  subcategoria: Subcategoria
   campos: Campo[]
 }
-interface EntradaObjeto extends ObjetoRef {
+
+interface EntradaObjeto {
   tipo: "objeto"
   key: string
+  objeto: Objeto
+  /** Todos los subgrupos DFDD a los que pertenece este FeatureConcept */
+  refs: ObjetoRef[]
   campos: Campo[]
 }
+
 interface EntradaAtributo {
   tipo: "atributo"
   key: string
   codigo: string
   nombre: string
-  detalle: AtributoDetalle | null
-  objetos: ObjetoRef[]
+  detalle: AtributoDetalle
+  /** Todos los subgrupos DFDD que incluyen este AttributeConcept */
+  subgrupos: SubgrupoRef[]
   campos: Campo[]
 }
 
@@ -131,94 +167,110 @@ export interface SearchIndex {
   atributos: EntradaAtributo[]
 }
 
-const padCodigo = (codigo: number, length: number) => codigo.toString().padStart(length, "0")
-
-/** Recorre el catálogo una sola vez y genera un índice plano de búsqueda. */
+/** Recorre el diccionario DFDD una sola vez y genera un índice plano deduplicado de búsqueda. */
 export const buildSearchIndex = (data: Categoria[], atributosDetalle: AtributoDetalle[]): SearchIndex => {
-  const detallePorCodigo = new Map(atributosDetalle.map((a) => [a.codigo, a]))
-  const atributosMap = new Map<string, { atributo: Atributo; objetos: ObjetoRef[] }>()
+  const subgrupoPorCodigo = new Map<string, SubgrupoRef>()
+  const objetosPorCodigo = new Map<string, { objeto: Objeto; refs: ObjetoRef[] }>()
 
   const index: SearchIndex = { categorias: [], subcategorias: [], objetos: [], atributos: [] }
 
   for (const categoria of data) {
     index.categorias.push({
       tipo: "categoria",
-      key: `c-${categoria.codigo}`,
+      key: `g-${categoria.codigo}`,
       categoria,
       campos: [
-        campo("Código", padCodigo(categoria.codigo, 2), 0),
+        campo("Código", categoria.codigo, 0),
+        campo("AlphaCode", categoria.alphaCode, 1),
         campo("Nombre", categoria.nombre, 1),
-        campo("Contenido", categoria.contenido, 3),
+        campo("Definición", categoria.contenido, 3),
+        campo("Descripción", categoria.descripcion, 4),
       ],
     })
 
     for (const subcategoria of categoria.subcategorias) {
+      const subRef: SubgrupoRef = { categoria, subcategoria }
+      subgrupoPorCodigo.set(subcategoria.codigo, subRef)
+
       index.subcategorias.push({
         tipo: "subcategoria",
-        key: `s-${subcategoria.codigo}`,
-        categoria,
-        subcategoria,
+        key: `sg-${subcategoria.codigo}`,
+        ...subRef,
         campos: [
-          campo("Código", padCodigo(subcategoria.codigo, 4), 0),
+          campo("Código", subcategoria.codigo, 0),
+          campo("AlphaCode", subcategoria.alphaCode, 1),
           campo("Nombre", subcategoria.nombre, 1),
-          campo("Contenido", subcategoria.contenido, 3),
+          campo("Definición", subcategoria.contenido, 3),
+          campo("Descripción", subcategoria.descripcion, 4),
         ],
       })
 
       for (const objeto of subcategoria.objetos) {
-        const ref: ObjetoRef = { categoria, subcategoria, objeto }
-        index.objetos.push({
-          tipo: "objeto",
-          key: `o-${objeto.codigo}`,
-          ...ref,
-          campos: [
-            campo("Código", padCodigo(objeto.codigo, 6), 0),
-            campo("Nombre", objeto.nombre, 1),
-            campo("Definición", objeto.definicion, 3),
-            campo("Geometría", objeto.geometria, 4),
-          ],
-        })
-
-        for (const atributo of objeto.atributos) {
-          const codigo = atributo.codigo?.trim()
-          if (!codigo) continue
-          const entry = atributosMap.get(codigo)
-          if (entry) entry.objetos.push(ref)
-          else atributosMap.set(codigo, { atributo, objetos: [ref] })
+        const ref: ObjetoRef = { ...subRef, objeto }
+        const existing = objetosPorCodigo.get(objeto.codigo)
+        if (existing) {
+          existing.refs.push(ref)
+        } else {
+          objetosPorCodigo.set(objeto.codigo, { objeto, refs: [ref] })
         }
       }
     }
   }
 
-  // Atributos usados en el catálogo
-  const agregarAtributo = (codigo: string, denominacion: string, objetos: ObjetoRef[]) => {
-    const detalle = detallePorCodigo.get(codigo) ?? null
-    const nombre = (detalle?.nombre || denominacion || codigo).trim()
-    const campos: Campo[] = [campo("Código", codigo, 0), campo("Nombre", nombre, 1)]
-    if (denominacion && normalize(denominacion).trim() !== normalize(nombre).trim()) {
-      campos.push(campo("Denominación", denominacion, 1))
-    }
-    if (detalle) {
-      campos.push(campo("Definición", detalle.definicion, 3))
-      campos.push(campo("Tipo", detalle.tipo, 4))
-      if (detalle.observaciones && detalle.observaciones !== "-") {
-        campos.push(campo("Observaciones", detalle.observaciones, 4))
-      }
-      for (const valor of detalle.dominio ?? []) {
-        campos.push(campo("Valor de dominio", valor.etiqueta, 2))
-        if (valor.definicion) campos.push(campo("Definición de valor", valor.definicion, 4))
-        if (valor.observaciones) campos.push(campo("Observación de valor", valor.observaciones, 4))
-      }
-    }
-    index.atributos.push({ tipo: "atributo", key: `a-${codigo}`, codigo, nombre, detalle, objetos, campos })
+  for (const [codigo, { objeto, refs }] of objetosPorCodigo) {
+    index.objetos.push({
+      tipo: "objeto",
+      key: `fc-${codigo}`,
+      objeto,
+      refs,
+      campos: [
+        campo("5-3-1 Code", objeto.codigo, 0),
+        campo("Short Name", objeto.shortName, 1),
+        campo("Nombre", objeto.nombre, 1),
+        campo("Alias", objeto.aliases, 2),
+        campo("Item ID", objeto.itemIdentifier ?? "", 2),
+        campo("Definición", objeto.definicion, 3),
+        campo("Descripción", objeto.descripcion, 4),
+      ],
+    })
   }
 
-  for (const [codigo, { atributo, objetos }] of atributosMap) {
-    agregarAtributo(codigo, atributo.denominacion, objetos)
-  }
-  // Atributos definidos en el diccionario pero no usados por ningún objeto
   for (const detalle of atributosDetalle) {
-    if (!atributosMap.has(detalle.codigo)) agregarAtributo(detalle.codigo, detalle.nombre, [])
+    const subgrupos: SubgrupoRef[] = []
+    for (const sgCode of detalle.subgrupos ?? []) {
+      const sgRef = subgrupoPorCodigo.get(sgCode)
+      if (sgRef) subgrupos.push(sgRef)
+    }
+
+    const campos: Campo[] = [
+      campo("5-3-1 Code", detalle.codigo, 0),
+      campo("Short Name", detalle.shortName, 1),
+      campo("Nombre", detalle.nombre, 1),
+      campo("Alias", detalle.aliases, 2),
+      campo("Tipo / Datatype", detalle.tipo, 2),
+      campo("Datatype Nombre", detalle.datatype?.nombre ?? "", 2),
+      campo("Definición", detalle.definicion, 3),
+      campo("Descripción", detalle.descripcion, 4),
+      campo("Cantidad física", detalle.cantidadFisica?.nombre ?? "", 3),
+      campo("Unidad recomendada", detalle.unidadRecomendada?.nombre ?? "", 3),
+      campo("Códigos adicionales", detalle.additionalCodes, 4),
+      campo("Item ID", detalle.itemIdentifier ?? "", 3),
+    ]
+
+    for (const valor of detalle.dominio ?? []) {
+      campos.push(campo("Valor de dominio", `${valor.codigo}: ${valor.etiqueta}`, 2))
+      if (valor.definicion) campos.push(campo("Definición de dominio", valor.definicion, 4))
+    }
+
+    index.atributos.push({
+      tipo: "atributo",
+      key: `ac-${detalle.codigo}`,
+      codigo: detalle.codigo,
+      nombre: detalle.nombre,
+      detalle,
+      subgrupos,
+      campos,
+    })
   }
 
   return index
@@ -260,7 +312,7 @@ const evaluar = <E extends Entrada>(entrada: E, q: string): SearchHit<E> | null 
   for (const c of entrada.campos) {
     if (!c.norm) continue
     let s: number
-    if (c.norm === q) s = c.peso * 10 // coincidencia exacta
+    if (c.norm === q) s = c.peso * 10
     else if (c.norm.startsWith(q)) s = c.peso * 10 + 1
     else if (c.norm.includes(q)) s = c.peso * 10 + 2
     else continue
@@ -287,9 +339,9 @@ const buscarEn = <E extends Entrada>(entradas: E[], q: string, nombreDe: (e: E) 
   entradas
     .map((e) => evaluar(e, q))
     .filter((h): h is SearchHit<E> => h !== null)
-    .sort((a, b) => a.score - b.score || nombreDe(a).localeCompare(nombreDe(b), "es"))
+    .sort((a, b) => a.score - b.score || nombreDe(a).localeCompare(nombreDe(b), "en"))
 
-/** Busca en todo el índice. Devuelve null si la consulta es demasiado corta. */
+/** Busca en todo el índice DFDD. Devuelve null si la consulta es demasiado corta. */
 export const searchIndex = (index: SearchIndex, query: string): SearchResults | null => {
   const q = normalize(query).trim()
   if (q.length < MIN_QUERY_LENGTH) return null
