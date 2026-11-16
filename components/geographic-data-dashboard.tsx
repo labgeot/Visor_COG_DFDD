@@ -499,34 +499,21 @@ export function GeographicDataDashboard() {
                   <h3 className="font-bold text-xs uppercase tracking-wider text-emerald-800 mb-1.5">
                     Referencias Oficiales DGIWG
                   </h3>
-                  <div className="flex flex-wrap gap-3 text-xs">
+                  <div className="flex flex-col gap-1.5 text-xs">
                     <a
                       href="https://www.dgiwg.org/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-900 underline font-medium"
+                      className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-900 underline font-medium w-fit"
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
-                      Portal DGIWG
+                      Portal Oficial DGIWG (dgiwg.org)
                     </a>
-                    <a
-                      href="https://www.dgiwg.org/FAD/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-900 underline"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      DGIWG FAD Registry (URI histórica)
-                    </a>
-                    <a
-                      href="https://geo.aitcnet.org/FAD/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-900 underline"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      Mirror AITCNet
-                    </a>
+                    <p className="text-[11px] text-gray-500">
+                      Nota: las URIs históricas del registro FAD de 2014 (<code className="font-mono">dgiwg.org/FAD/</code>{" "}
+                      y el mirror <code className="font-mono">geo.aitcnet.org/FAD/</code>) fueron dadas de baja al
+                      migrar DGIWG hacia DGIF.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -894,17 +881,6 @@ export function GeographicDataDashboard() {
                                   <FileText className="h-3.5 w-3.5 mr-1.5" />
                                   Detalle y Atributos
                                 </Button>
-                                {objeto.url && (
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="bg-white"
-                                    title="Abrir en DGIWG FAD Registry"
-                                    onClick={() => window.open(objeto.url, "_blank", "noopener,noreferrer")}
-                                  >
-                                    <ExternalLink className="h-3.5 w-3.5" />
-                                  </Button>
-                                )}
                               </div>
                             </CardContent>
                           </Card>
@@ -979,16 +955,6 @@ export function GeographicDataDashboard() {
                                 <FileText className="h-3.5 w-3.5 mr-1.5" />
                                 Ver especificación
                               </Button>
-                              {attr.url && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => window.open(attr.url, "_blank", "noopener,noreferrer")}
-                                  title="Abrir en DGIWG FAD Registry"
-                                >
-                                  <ExternalLink className="h-3.5 w-3.5" />
-                                </Button>
-                              )}
                             </div>
                           </CardContent>
                         </Card>
@@ -1071,33 +1037,12 @@ export function GeographicDataDashboard() {
                 </div>
               </div>
 
-              {/* Actions */}
-              <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200">
+              {/* Actions & Historical URI */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-200">
                 {openObjeto.url && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.open(openObjeto.url, "_blank", "noopener,noreferrer")}
-                  >
-                    <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
-                    DGIWG FAD Registry
-                  </Button>
-                )}
-                {openObjeto.itemIdentifier && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      window.open(
-                        `https://geo.aitcnet.org/FAD/fdd/view?i=${openObjeto.itemIdentifier}`,
-                        "_blank",
-                        "noopener,noreferrer",
-                      )
-                    }
-                  >
-                    <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
-                    Mirror AITCNet
-                  </Button>
+                  <span className="text-[11px] text-gray-500 font-mono break-all">
+                    URI histórica FAD (2014): {openObjeto.url}
+                  </span>
                 )}
                 <Button
                   variant="outline"
@@ -1391,17 +1336,12 @@ export function GeographicDataDashboard() {
                 </div>
               </div>
 
-              {/* Actions */}
-              <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200">
+              {/* Actions & Historical URI */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-200">
                 {openAtributo.url && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.open(openAtributo.url, "_blank", "noopener,noreferrer")}
-                  >
-                    <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
-                    DGIWG FAD Registry
-                  </Button>
+                  <span className="text-[11px] text-gray-500 font-mono break-all">
+                    URI histórica FAD (2014): {openAtributo.url}
+                  </span>
                 )}
                 <Button
                   variant="outline"

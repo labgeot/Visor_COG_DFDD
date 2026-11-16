@@ -120,15 +120,15 @@ Adaptada para mostrar:
 En [layout.tsx](file:///C:/Users/feder/OneDrive/Documentos/GitHub/DFDD/app/layout.tsx) se actualizaron `title` y `description` al DGIWG DFDD Baseline 2013-1.00.
 
 En [geographic-data-dashboard.tsx](file:///C:/Users/feder/OneDrive/Documentos/GitHub/DFDD/components/geographic-data-dashboard.tsx):
-1. **Header Sticky y Banner de Portada**: gradiente verde institucional (`from-[#1a4731] via-[#2d6a4f] to-[#40916c]`), badges de estándares (`ISO 19110`, `ISO 19126`, `ISO 19135`), metadatos extraídos de la hoja `Cover`, métricas en vivo (`14` Grupos, `82` Subgrupos, `935` Feature Concepts, `1.774` Atributos) y enlaces al **DGIWG FAD Registry** y su mirror **AITCNet**.
+1. **Header Sticky y Banner de Portada**: gradiente verde institucional (`from-[#1a4731] via-[#2d6a4f] to-[#40916c]`), badges de estándares (`ISO 19126`, `ISO 19135`, `ISO 19110`), metadatos extraídos de la hoja `Cover`, métricas en vivo (`14` Grupos, `82` Subgrupos, `935` Feature Concepts, `1.774` Attribute Concepts, `872` Datatypes y `10.769` Valores de Dominio) y enlace activo al portal oficial [dgiwg.org](https://www.dgiwg.org/) (las rutas obsoletas `dgiwg.org/FAD/` y `geo.aitcnet.org/FAD/` fueron retiradas como enlaces activos para evitar errores 404).
 2. **Paleta de Grupos (`groupColors`)**: mapeo completo de los códigos `"01"`–`"10"` y `"20"`–`"23"` con iconografía `lucide-react`.
 3. **Navegación con Breadcrumbs**: ruta interactiva `Grupos > Grupo > Subgrupo` y buscador global con botón de limpieza y tecla `Escape`.
 4. **Vista de Subgrupo con Pestañas (`Tabs`)**:
    - Pestaña **Feature Concepts** y pestaña **Attribute Concepts**, con filtro local instantáneo dentro del subgrupo.
    - Si un subgrupo carece de Feature Concepts (`03.09` y `22.02`), se selecciona automáticamente la pestaña **Attribute Concepts**.
 5. **Diálogos Controlados**:
-   - **Detalle de Feature Concept (`openObjeto`)**: `5-3-1 Code`, `Short Name`, `Item Identifier`, definición, descripción, alias, subgrupos clickeables para navegar entre ellos, enlaces externos al FAD Registry, exportación a JSON y listado filtrable de los Attribute Concepts del subgrupo activo.
-   - **Detalle de Attribute Concept (`openAtributo`)**: especificación completa del Datatype (incluyendo subcampos para tipos `complex`, longitud, rangos y estructura), magnitud física, unidad de medida recomendada (con código UNECE), códigos GIFD/MGCP, dominio de valores enumerados con buscador interno y exportación a JSON.
+   - **Detalle de Feature Concept (`openObjeto`)**: `5-3-1 Code`, `Short Name`, `Item Identifier`, definición, descripción, alias, subgrupos clickeables para navegar entre ellos, URI histórica FAD (2014) en texto de referencia, exportación a JSON y listado filtrable de los Attribute Concepts del subgrupo activo.
+   - **Detalle de Attribute Concept (`openAtributo`)**: especificación completa del Datatype (incluyendo subcampos para tipos `complex`, longitud, rangos y estructura), magnitud física, unidad de medida recomendada (con código UNECE), códigos GIFD/MGCP, dominio de valores enumerados con buscador interno, URI histórica FAD (2014) y exportación a JSON.
 
 ---
 
