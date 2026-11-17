@@ -117,16 +117,17 @@ Adaptada para mostrar:
 
 ## 6. Paso 4 — Adaptación del Dashboard e Interfaz (`components/geographic-data-dashboard.tsx` y `app/layout.tsx`)
 
-En [layout.tsx](file:///C:/Users/feder/OneDrive/Documentos/GitHub/DFDD/app/layout.tsx) se actualizaron `title` y `description` al DGIWG DFDD Baseline 2013-1.00.
+En [layout.tsx](file:///C:/Users/feder/OneDrive/Documentos/GitHub/DFDD/app/layout.tsx) se actualizaron `lang="en"`, `title` y `description` al DGIWG DFDD Baseline 2013-1.00.
 
-En [geographic-data-dashboard.tsx](file:///C:/Users/feder/OneDrive/Documentos/GitHub/DFDD/components/geographic-data-dashboard.tsx):
-1. **Header Sticky y Banner de Portada**: gradiente verde institucional (`from-[#1a4731] via-[#2d6a4f] to-[#40916c]`), badges de estándares (`ISO 19126`, `ISO 19135`, `ISO 19110`), metadatos extraídos de la hoja `Cover`, métricas en vivo (`14` Grupos, `82` Subgrupos, `935` Feature Concepts, `1.774` Attribute Concepts, `872` Datatypes y `10.769` Valores de Dominio) y enlace activo al portal oficial [dgiwg.org](https://www.dgiwg.org/) (las rutas obsoletas `dgiwg.org/FAD/` y `geo.aitcnet.org/FAD/` fueron retiradas como enlaces activos para evitar errores 404).
-2. **Paleta de Grupos (`groupColors`)**: mapeo completo de los códigos `"01"`–`"10"` y `"20"`–`"23"` con iconografía `lucide-react`.
-3. **Navegación con Breadcrumbs**: ruta interactiva `Grupos > Grupo > Subgrupo` y buscador global con botón de limpieza y tecla `Escape`.
-4. **Vista de Subgrupo con Pestañas (`Tabs`)**:
+En [geographic-data-dashboard.tsx](file:///C:/Users/feder/OneDrive/Documentos/GitHub/DFDD/components/geographic-data-dashboard.tsx) y [search-results.tsx](file:///C:/Users/feder/OneDrive/Documentos/GitHub/DFDD/components/search-results.tsx):
+1. **Interfaz íntegramente en inglés (`English (OED)`)**: toda la interfaz de usuario (encabezado, banner, breadcrumbs, buscador, pestañas, tarjetas y modales) se unificó en inglés para mantener coherencia terminológica con el contenido oficial del DFDD (*Groups*, *Subgroups*, *Feature Concepts*, *Attribute Concepts*, *Datatypes*, *Listed Values*).
+2. **Header Sticky y Banner de Portada**: gradiente verde institucional (`from-[#1a4731] via-[#2d6a4f] to-[#40916c]`), badges de estándares (`ISO 19126`, `ISO 19135`, `ISO 19110`), metadatos extraídos de la hoja `Cover`, métricas en vivo (`14` Groups, `82` Subgroups, `935` Feature Concepts, `1,774` Attribute Concepts, `870` Datatypes y `10,760` Listed Values) y enlace activo al portal oficial [dgiwg.org](https://www.dgiwg.org/) (las rutas obsoletas `dgiwg.org/FAD/` y `geo.aitcnet.org/FAD/` fueron retiradas como enlaces activos para evitar errores 404).
+3. **Paleta de Grupos (`groupColors`)**: mapeo completo de los códigos `"01"`–`"10"` y `"20"`–`"23"` con iconografía `lucide-react`.
+4. **Navegación con Breadcrumbs y Subgrupos en Todas las Tarjetas**: ruta interactiva `Groups > Group > Subgroup`, buscador global con botón de limpieza y tecla `Escape`, y visualización permanente en **todas** las tarjetas de *Feature Concepts* y *Attribute Concepts* de los códigos de subgrupo (`03.01`, `03.02`, etc.) donde se clasifican, con navegación directa al hacer clic.
+5. **Vista de Subgrupo con Pestañas (`Tabs`)**:
    - Pestaña **Feature Concepts** y pestaña **Attribute Concepts**, con filtro local instantáneo dentro del subgrupo.
    - Si un subgrupo carece de Feature Concepts (`03.09` y `22.02`), se selecciona automáticamente la pestaña **Attribute Concepts**.
-5. **Diálogos Controlados**:
+6. **Diálogos Controlados**:
    - **Detalle de Feature Concept (`openObjeto`)**: `5-3-1 Code`, `Short Name`, `Item Identifier`, definición, descripción, alias, subgrupos clickeables para navegar entre ellos, URI histórica FAD (2014) en texto de referencia, exportación a JSON y listado filtrable de los Attribute Concepts del subgrupo activo.
    - **Detalle de Attribute Concept (`openAtributo`)**: especificación completa del Datatype (incluyendo subcampos para tipos `complex`, longitud, rangos y estructura), magnitud física, unidad de medida recomendada (con código UNECE), códigos GIFD/MGCP, dominio de valores enumerados con buscador interno, URI histórica FAD (2014) y exportación a JSON.
 

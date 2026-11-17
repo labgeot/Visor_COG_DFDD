@@ -180,11 +180,11 @@ export const buildSearchIndex = (data: Categoria[], atributosDetalle: AtributoDe
       key: `g-${categoria.codigo}`,
       categoria,
       campos: [
-        campo("Código", categoria.codigo, 0),
+        campo("Code", categoria.codigo, 0),
         campo("AlphaCode", categoria.alphaCode, 1),
-        campo("Nombre", categoria.nombre, 1),
-        campo("Definición", categoria.contenido, 3),
-        campo("Descripción", categoria.descripcion, 4),
+        campo("Name", categoria.nombre, 1),
+        campo("Definition", categoria.contenido, 3),
+        campo("Description", categoria.descripcion, 4),
       ],
     })
 
@@ -197,11 +197,11 @@ export const buildSearchIndex = (data: Categoria[], atributosDetalle: AtributoDe
         key: `sg-${subcategoria.codigo}`,
         ...subRef,
         campos: [
-          campo("Código", subcategoria.codigo, 0),
+          campo("Code", subcategoria.codigo, 0),
           campo("AlphaCode", subcategoria.alphaCode, 1),
-          campo("Nombre", subcategoria.nombre, 1),
-          campo("Definición", subcategoria.contenido, 3),
-          campo("Descripción", subcategoria.descripcion, 4),
+          campo("Name", subcategoria.nombre, 1),
+          campo("Definition", subcategoria.contenido, 3),
+          campo("Description", subcategoria.descripcion, 4),
         ],
       })
 
@@ -226,11 +226,11 @@ export const buildSearchIndex = (data: Categoria[], atributosDetalle: AtributoDe
       campos: [
         campo("5-3-1 Code", objeto.codigo, 0),
         campo("Short Name", objeto.shortName, 1),
-        campo("Nombre", objeto.nombre, 1),
-        campo("Alias", objeto.aliases, 2),
+        campo("Name", objeto.nombre, 1),
+        campo("Alias(es)", objeto.aliases, 2),
         campo("Item ID", objeto.itemIdentifier ?? "", 2),
-        campo("Definición", objeto.definicion, 3),
-        campo("Descripción", objeto.descripcion, 4),
+        campo("Definition", objeto.definicion, 3),
+        campo("Description", objeto.descripcion, 4),
       ],
     })
   }
@@ -245,21 +245,21 @@ export const buildSearchIndex = (data: Categoria[], atributosDetalle: AtributoDe
     const campos: Campo[] = [
       campo("5-3-1 Code", detalle.codigo, 0),
       campo("Short Name", detalle.shortName, 1),
-      campo("Nombre", detalle.nombre, 1),
-      campo("Alias", detalle.aliases, 2),
-      campo("Tipo / Datatype", detalle.tipo, 2),
-      campo("Datatype Nombre", detalle.datatype?.nombre ?? "", 2),
-      campo("Definición", detalle.definicion, 3),
-      campo("Descripción", detalle.descripcion, 4),
-      campo("Cantidad física", detalle.cantidadFisica?.nombre ?? "", 3),
-      campo("Unidad recomendada", detalle.unidadRecomendada?.nombre ?? "", 3),
-      campo("Códigos adicionales", detalle.additionalCodes, 4),
+      campo("Name", detalle.nombre, 1),
+      campo("Alias(es)", detalle.aliases, 2),
+      campo("Datatype", detalle.tipo, 2),
+      campo("Datatype Name", detalle.datatype?.nombre ?? "", 2),
+      campo("Definition", detalle.definicion, 3),
+      campo("Description", detalle.descripcion, 4),
+      campo("Physical Quantity", detalle.cantidadFisica?.nombre ?? "", 3),
+      campo("Recommended Unit", detalle.unidadRecomendada?.nombre ?? "", 3),
+      campo("Additional Codes", detalle.additionalCodes, 4),
       campo("Item ID", detalle.itemIdentifier ?? "", 3),
     ]
 
     for (const valor of detalle.dominio ?? []) {
-      campos.push(campo("Valor de dominio", `${valor.codigo}: ${valor.etiqueta}`, 2))
-      if (valor.definicion) campos.push(campo("Definición de dominio", valor.definicion, 4))
+      campos.push(campo("Listed Value", `${valor.codigo}: ${valor.etiqueta}`, 2))
+      if (valor.definicion) campos.push(campo("Listed Value Definition", valor.definicion, 4))
     }
 
     index.atributos.push({

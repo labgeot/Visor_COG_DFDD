@@ -7,7 +7,7 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: "DGIWG Feature Data Dictionary (DFDD) — Baseline 2013-1.00",
   description:
-    "Visualizador interactivo para el Defence Geospatial Information Working Group (DGIWG) Feature Data Dictionary (DFDD) Baseline 2013-1.00 — ISO 19126 / ISO 19135 / ISO 19110",
+    "Interactive viewer for the Defence Geospatial Information Working Group (DGIWG) Feature Data Dictionary (DFDD) Baseline 2013-1.00 — ISO 19126 / ISO 19135 / ISO 19110",
   generator: "Next.js 14",
 }
 
@@ -17,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es">
+    <html lang="en">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>{children}</body>
     </html>
   )

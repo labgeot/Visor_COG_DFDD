@@ -182,7 +182,7 @@ export function GeographicDataDashboard() {
   const [atributos, setAtributos] = useState<AtributoDetalle[]>([])
   const [atributosLoaded, setAtributosLoaded] = useState(false)
 
-  // Modales controlados
+  // Controlled dialogs
   const [openObjeto, setOpenObjeto] = useState<Objeto | null>(null)
   const [openAtributo, setOpenAtributo] = useState<AtributoDetalle | null>(null)
   const [domainFilter, setDomainFilter] = useState("")
@@ -240,7 +240,7 @@ export function GeographicDataDashboard() {
     }
   }, [data, atributos])
 
-  // Búsqueda global con debounce de 200ms
+  // Global search with 200ms debounce
   const debouncedSearchTerm = useDebounce(searchTerm, 200)
   const searchIdx = useMemo(() => buildSearchIndex(data, atributos), [data, atributos])
   const searchResults = useMemo(() => searchIndex(searchIdx, debouncedSearchTerm), [searchIdx, debouncedSearchTerm])
@@ -290,7 +290,7 @@ export function GeographicDataDashboard() {
     setSearchTerm("")
   }
 
-  /* ----------------------- Navegación desde la búsqueda ---------------------- */
+  /* ----------------------- Search Navigation Handlers ---------------------- */
 
   const handleSearchSelectCategoria = (categoria: Categoria) => {
     handleCategorySelect(categoria)
@@ -328,7 +328,6 @@ export function GeographicDataDashboard() {
     })
   }
 
-  // Atributos del subgrupo seleccionado
   const selectedSubgroupAttributes = useMemo(() => {
     if (!selectedSubcategory) return []
     return selectedSubcategory.atributosCodigos
@@ -430,33 +429,33 @@ export function GeographicDataDashboard() {
               <div className="space-y-4">
                 <div>
                   <h3 className="font-bold text-xs uppercase tracking-wider text-emerald-800 mb-1">
-                    Alcance y Contexto DGIWG
+                    Scope &amp; DGIWG Context
                   </h3>
                   <p className="text-sm text-gray-800 leading-relaxed">
-                    El <strong>DGIWG Feature Data Dictionary (DFDD)</strong> es el diccionario conceptual estandarizado
-                    del <em>Defence Geospatial Information Working Group</em> (mantenido por el equipo{" "}
-                    <em>Feature and Attribute Data - FAD</em>), conforme a <strong>ISO 19126</strong>,{" "}
-                    <strong>ISO 19135</strong> e <strong>ISO 19110</strong>. Utiliza códigos <strong>5-3-1</strong>{" "}
-                    heredados de DIGEST/FACC para garantizar interoperabilidad semántica en cartografía y sistemas de
-                    defensa (MGCP, esquemas de aplicación).
+                    The <strong>DGIWG Feature Data Dictionary (DFDD)</strong> is the standardized concept dictionary
+                    maintained by the <em>Defence Geospatial Information Working Group</em> (<em>Feature and Attribute
+                    Data — FAD Project Team</em>) in accordance with <strong>ISO 19126</strong>,{" "}
+                    <strong>ISO 19135</strong>, and <strong>ISO 19110</strong>. It uses <strong>5-3-1</strong> codes
+                    derived from DIGEST/FACC to support semantic interoperability across defence mapping and application
+                    schemas (such as MGCP).
                   </p>
                   <p className="text-xs text-gray-600 mt-2 leading-relaxed">
-                    <strong>Evolución del estándar:</strong> en la arquitectura actual de DGIWG (<strong>DGIF</strong>),
-                    el DFDD fue sucedido funcionalmente por <strong>DGIWG 206 (DGFCD)</strong> junto con{" "}
-                    <strong>DGIWG 205 (DGIM)</strong> y <strong>DGIWG 207 (DGRWI)</strong>.
+                    <strong>Standard Evolution:</strong> within the current DGIWG architecture (<strong>DGIF</strong>),
+                    the DFDD was functionally succeeded by <strong>DGIWG 206 (DGFCD)</strong> alongside{" "}
+                    <strong>DGIWG 205 (DGIM)</strong> and <strong>DGIWG 207 (DGRWI)</strong>.
                   </p>
                 </div>
                 <div className="grid grid-cols-3 gap-4 pt-1">
                   <div>
-                    <h3 className="font-bold text-xs uppercase tracking-wider text-emerald-800 mb-0.5">Versión</h3>
+                    <h3 className="font-bold text-xs uppercase tracking-wider text-emerald-800 mb-0.5">Version</h3>
                     <p className="text-sm font-medium text-gray-900">BL 2013-1.00</p>
                   </div>
                   <div>
-                    <h3 className="font-bold text-xs uppercase tracking-wider text-emerald-800 mb-0.5">Preparado</h3>
+                    <h3 className="font-bold text-xs uppercase tracking-wider text-emerald-800 mb-0.5">Prepared</h3>
                     <p className="text-sm font-medium text-gray-900">26 May 2014</p>
                   </div>
                   <div>
-                    <h3 className="font-bold text-xs uppercase tracking-wider text-emerald-800 mb-0.5">Idioma</h3>
+                    <h3 className="font-bold text-xs uppercase tracking-wider text-emerald-800 mb-0.5">Language</h3>
                     <p className="text-sm font-medium text-gray-900">English (OED)</p>
                   </div>
                 </div>
@@ -465,16 +464,16 @@ export function GeographicDataDashboard() {
               <div className="space-y-4">
                 <div>
                   <h3 className="font-bold text-xs uppercase tracking-wider text-emerald-800 mb-2">
-                    Cobertura del Diccionario
+                    Dictionary Coverage
                   </h3>
                   <div className="grid grid-cols-3 gap-2">
                     <div className="rounded-lg border border-emerald-200 bg-white p-2.5 text-center">
                       <div className="text-lg font-bold text-emerald-800">{stats.grupos}</div>
-                      <div className="text-[11px] text-gray-600">Grupos</div>
+                      <div className="text-[11px] text-gray-600">Groups</div>
                     </div>
                     <div className="rounded-lg border border-emerald-200 bg-white p-2.5 text-center">
                       <div className="text-lg font-bold text-emerald-800">{stats.subgrupos}</div>
-                      <div className="text-[11px] text-gray-600">Subgrupos</div>
+                      <div className="text-[11px] text-gray-600">Subgroups</div>
                     </div>
                     <div className="rounded-lg border border-emerald-200 bg-white p-2.5 text-center">
                       <div className="text-lg font-bold text-emerald-800">{stats.objetosUnicos}</div>
@@ -489,15 +488,15 @@ export function GeographicDataDashboard() {
                       <div className="text-[11px] text-gray-600">Datatypes</div>
                     </div>
                     <div className="rounded-lg border border-emerald-200 bg-white p-2.5 text-center">
-                      <div className="text-lg font-bold text-emerald-800">{stats.dominios.toLocaleString("es-AR")}</div>
-                      <div className="text-[11px] text-gray-600">Valores Dominio</div>
+                      <div className="text-lg font-bold text-emerald-800">{stats.dominios.toLocaleString("en-US")}</div>
+                      <div className="text-[11px] text-gray-600">Listed Values</div>
                     </div>
                   </div>
                 </div>
 
                 <div>
                   <h3 className="font-bold text-xs uppercase tracking-wider text-emerald-800 mb-1.5">
-                    Referencias Oficiales DGIWG
+                    Official DGIWG References
                   </h3>
                   <div className="flex flex-col gap-1.5 text-xs">
                     <a
@@ -507,12 +506,12 @@ export function GeographicDataDashboard() {
                       className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-900 underline font-medium w-fit"
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
-                      Portal Oficial DGIWG (dgiwg.org)
+                      Official DGIWG Portal (dgiwg.org)
                     </a>
                     <p className="text-[11px] text-gray-500">
-                      Nota: las URIs históricas del registro FAD de 2014 (<code className="font-mono">dgiwg.org/FAD/</code>{" "}
-                      y el mirror <code className="font-mono">geo.aitcnet.org/FAD/</code>) fueron dadas de baja al
-                      migrar DGIWG hacia DGIF.
+                      Note: historical 2014 FAD Registry URIs (<code className="font-mono">dgiwg.org/FAD/</code> and
+                      mirror <code className="font-mono">geo.aitcnet.org/FAD/</code>) were retired when DGIWG migrated
+                      to DGIF.
                     </p>
                   </div>
                 </div>
@@ -533,13 +532,13 @@ export function GeographicDataDashboard() {
                   className="flex items-center gap-2 bg-white border-emerald-300 text-emerald-900 hover:bg-emerald-50"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  Volver
+                  Back
                 </Button>
               )}
 
               {/* Breadcrumbs */}
               {!searchResults && currentLevel !== "categories" && selectedCategory && (
-                <nav aria-label="Ruta de navegación" className="flex items-center gap-1 text-xs text-gray-600">
+                <nav aria-label="Breadcrumb navigation" className="flex items-center gap-1 text-xs text-gray-600">
                   <button
                     type="button"
                     onClick={() => {
@@ -549,7 +548,7 @@ export function GeographicDataDashboard() {
                     }}
                     className="hover:text-emerald-800 font-medium underline-offset-2 hover:underline"
                   >
-                    Grupos
+                    Groups
                   </button>
                   <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
                   <button
@@ -578,8 +577,8 @@ export function GeographicDataDashboard() {
               <Input
                 id="global-search-input"
                 type="search"
-                aria-label="Buscar en el DFDD"
-                placeholder="Buscar grupos, subgrupos, objetos (ej. FA005, Bridge), atributos o dominios..."
+                aria-label="Search the DFDD"
+                placeholder="Search groups, subgroups, feature concepts (e.g. FA005, Bridge), attributes, or listed values..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={(e) => e.key === "Escape" && setSearchTerm("")}
@@ -589,7 +588,7 @@ export function GeographicDataDashboard() {
                 <button
                   type="button"
                   id="global-search-clear"
-                  aria-label="Limpiar búsqueda"
+                  aria-label="Clear search"
                   onClick={() => setSearchTerm("")}
                   className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
                 >
@@ -600,7 +599,7 @@ export function GeographicDataDashboard() {
           </div>
 
           {!atributosLoaded && (
-            <p className="text-xs text-emerald-700">Cargando diccionario completo de atributos y dominios...</p>
+            <p className="text-xs text-emerald-700">Loading complete attribute dictionary and listed values...</p>
           )}
 
           {/* Global Search Results */}
@@ -648,7 +647,7 @@ export function GeographicDataDashboard() {
                         Group {categoria.codigo}
                       </Badge>
                       <div className="text-[11px] text-gray-700">
-                        {categoria.subcategorias.length} subgrupos · {uniqueObj.size} OG · {uniqueAttr.size} atrib.
+                        {categoria.subcategorias.length} subgroups · {uniqueObj.size} FC · {uniqueAttr.size} attr.
                       </div>
                     </div>
                   </div>
@@ -713,7 +712,8 @@ export function GeographicDataDashboard() {
                           {subcategoria.codigo}
                         </Badge>
                         <div className="text-xs text-gray-700">
-                          {subcategoria.objetos.length} Feature Concepts · {subcategoria.atributosCodigos.length} Atributos
+                          {subcategoria.objetos.length} Feature Concepts · {subcategoria.atributosCodigos.length}{" "}
+                          Attributes
                         </div>
                       </div>
                     </div>
@@ -769,7 +769,7 @@ export function GeographicDataDashboard() {
                     <Input
                       type="search"
                       placeholder={
-                        subgroupTab === "objects" ? "Filtrar Feature Concepts..." : "Filtrar Attribute Concepts..."
+                        subgroupTab === "objects" ? "Filter Feature Concepts..." : "Filter Attribute Concepts..."
                       }
                       value={subgroupFilter}
                       onChange={(e) => setSubgroupFilter(e.target.value)}
@@ -778,6 +778,7 @@ export function GeographicDataDashboard() {
                     {subgroupFilter && (
                       <button
                         type="button"
+                        aria-label="Clear filter"
                         onClick={() => setSubgroupFilter("")}
                         className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
                       >
@@ -793,8 +794,8 @@ export function GeographicDataDashboard() {
                     <Card className="border-dashed border-2 border-gray-300 bg-white/70">
                       <CardContent className="py-10 text-center text-sm text-gray-600">
                         {selectedSubcategory.objetos.length === 0
-                          ? "Este subgrupo no contiene Feature Concepts en el DFDD; consultá la pestaña Attribute Concepts."
-                          : "No hay Feature Concepts que coincidan con el filtro."}
+                          ? "This subgroup has no Feature Concepts in the DFDD; check the Attribute Concepts tab."
+                          : "No Feature Concepts match the current filter."}
                       </CardContent>
                     </Card>
                   ) : (
@@ -825,7 +826,7 @@ export function GeographicDataDashboard() {
                               <CardTitle className="text-lg leading-tight">{objeto.nombre}</CardTitle>
                               {objeto.aliases && (
                                 <p className="text-xs text-gray-500 mt-1">
-                                  <span className="font-medium">Alias:</span> {objeto.aliases}
+                                  <span className="font-medium">Alias(es):</span> {objeto.aliases}
                                 </p>
                               )}
                             </CardHeader>
@@ -845,26 +846,37 @@ export function GeographicDataDashboard() {
                                     onClick={() => toggleDefinition(objeto.codigo)}
                                     className="text-xs text-emerald-700 hover:text-emerald-900 mt-1 font-medium"
                                   >
-                                    {isExpanded ? "Leer menos" : "Leer más"}
+                                    {isExpanded ? "Read less" : "Read more"}
                                   </button>
                                 )}
                               </div>
 
-                              {objeto.subgrupos.length > 1 && (
-                                <div className="flex flex-wrap gap-1">
-                                  {objeto.subgrupos.map((sg) => (
-                                    <Badge
-                                      key={sg}
-                                      variant="outline"
-                                      className={`text-[11px] font-mono ${
-                                        sg === selectedSubcategory.codigo
-                                          ? "bg-emerald-50 border-emerald-300 text-emerald-800"
-                                          : "text-gray-500"
-                                      }`}
-                                    >
-                                      {sg}
-                                    </Badge>
-                                  ))}
+                              {objeto.subgrupos.length > 0 && (
+                                <div className="space-y-1">
+                                  <div className="text-[11px] font-medium text-gray-500">
+                                    Subgroups ({objeto.subgrupos.length}):
+                                  </div>
+                                  <div className="flex flex-wrap gap-1">
+                                    {objeto.subgrupos.map((sg) => {
+                                      const sgRef = subgroupLookup.get(sg)
+                                      const isCurrent = sg === selectedSubcategory.codigo
+                                      return (
+                                        <button
+                                          key={sg}
+                                          type="button"
+                                          title={sgRef ? `${sg} · ${sgRef.subcategoria.nombre}` : sg}
+                                          onClick={() => !isCurrent && handleNavigateSubgroupCode(sg)}
+                                          className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-mono transition-colors ${
+                                            isCurrent
+                                              ? "bg-emerald-50 border-emerald-300 text-emerald-800 font-semibold cursor-default"
+                                              : "bg-white border-gray-200 text-gray-600 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-800 cursor-pointer"
+                                          }`}
+                                        >
+                                          {sg}
+                                        </button>
+                                      )
+                                    })}
+                                  </div>
                                 </div>
                               )}
 
@@ -879,7 +891,7 @@ export function GeographicDataDashboard() {
                                   }}
                                 >
                                   <FileText className="h-3.5 w-3.5 mr-1.5" />
-                                  Detalle y Atributos
+                                  Details &amp; Attributes
                                 </Button>
                               </div>
                             </CardContent>
@@ -896,8 +908,8 @@ export function GeographicDataDashboard() {
                     <Card className="border-dashed border-2 border-gray-300 bg-white/70">
                       <CardContent className="py-10 text-center text-sm text-gray-600">
                         {selectedSubcategory.atributosCodigos.length === 0
-                          ? "Este subgrupo no tiene Attribute Concepts asociados en el DFDD."
-                          : "No hay Attribute Concepts que coincidan con el filtro."}
+                          ? "This subgroup has no Attribute Concepts assigned in the DFDD."
+                          : "No Attribute Concepts match the current filter."}
                       </CardContent>
                     </Card>
                   ) : (
@@ -917,7 +929,7 @@ export function GeographicDataDashboard() {
                               </Badge>
                               {attr.dominio && attr.dominio.length > 0 && (
                                 <Badge className="bg-amber-100 text-amber-900 hover:bg-amber-100 text-xs">
-                                  {attr.dominio.length} valores
+                                  {attr.dominio.length} values
                                 </Badge>
                               )}
                             </div>
@@ -942,6 +954,35 @@ export function GeographicDataDashboard() {
                               )}
                             </div>
 
+                            {attr.subgrupos.length > 0 && (
+                              <div className="space-y-1">
+                                <div className="text-[11px] font-medium text-gray-500">
+                                  Subgroups ({attr.subgrupos.length}):
+                                </div>
+                                <div className="flex flex-wrap gap-1">
+                                  {attr.subgrupos.map((sg) => {
+                                    const sgRef = subgroupLookup.get(sg)
+                                    const isCurrent = sg === selectedSubcategory.codigo
+                                    return (
+                                      <button
+                                        key={sg}
+                                        type="button"
+                                        title={sgRef ? `${sg} · ${sgRef.subcategoria.nombre}` : sg}
+                                        onClick={() => !isCurrent && handleNavigateSubgroupCode(sg)}
+                                        className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-mono transition-colors ${
+                                          isCurrent
+                                            ? "bg-emerald-50 border-emerald-300 text-emerald-800 font-semibold cursor-default"
+                                            : "bg-white border-gray-200 text-gray-600 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-800 cursor-pointer"
+                                        }`}
+                                      >
+                                        {sg}
+                                      </button>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
                             <div className="flex gap-2 pt-1">
                               <Button
                                 variant="outline"
@@ -953,7 +994,7 @@ export function GeographicDataDashboard() {
                                 }}
                               >
                                 <FileText className="h-3.5 w-3.5 mr-1.5" />
-                                Ver especificación
+                                View specification
                               </Button>
                             </div>
                           </CardContent>
@@ -998,13 +1039,13 @@ export function GeographicDataDashboard() {
 
             <div className="space-y-4 mt-2">
               <div>
-                <h4 className="font-semibold text-sm text-gray-800 mb-1">Definición</h4>
+                <h4 className="font-semibold text-sm text-gray-800 mb-1">Definition</h4>
                 <p className="text-sm text-gray-700 leading-relaxed">{openObjeto.definicion}</p>
               </div>
 
               {openObjeto.descripcion && (
                 <div>
-                  <h4 className="font-semibold text-sm text-gray-800 mb-1">Descripción</h4>
+                  <h4 className="font-semibold text-sm text-gray-800 mb-1">Description</h4>
                   <p className="text-sm text-gray-700 leading-relaxed">{openObjeto.descripcion}</p>
                 </div>
               )}
@@ -1018,7 +1059,7 @@ export function GeographicDataDashboard() {
 
               <div>
                 <h4 className="font-semibold text-sm text-gray-800 mb-1.5">
-                  Subgrupos en el DFDD ({openObjeto.subgrupos.length})
+                  DFDD Subgroups ({openObjeto.subgrupos.length})
                 </h4>
                 <div className="flex flex-wrap gap-1.5">
                   {openObjeto.subgrupos.map((sgCode) => {
@@ -1041,7 +1082,7 @@ export function GeographicDataDashboard() {
               <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-200">
                 {openObjeto.url && (
                   <span className="text-[11px] text-gray-500 font-mono break-all">
-                    URI histórica FAD (2014): {openObjeto.url}
+                    Historical FAD URI (2014): {openObjeto.url}
                   </span>
                 )}
                 <Button
@@ -1061,7 +1102,7 @@ export function GeographicDataDashboard() {
                   }
                 >
                   <Download className="h-3.5 w-3.5 mr-1.5" />
-                  Exportar JSON
+                  Export JSON
                 </Button>
               </div>
 
@@ -1071,17 +1112,17 @@ export function GeographicDataDashboard() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                       <h4 className="font-semibold text-sm text-gray-800">
-                        Attribute Concepts del subgrupo {selectedSubcategory.codigo} ({selectedSubgroupAttributes.length})
+                        Subgroup {selectedSubcategory.codigo} Attribute Concepts ({selectedSubgroupAttributes.length})
                       </h4>
                       <p className="text-xs text-gray-500">
-                        En el DFDD, los atributos se clasifican por subgrupo temático. Hacé clic en uno para ver su
-                        tipo de dato y dominio.
+                        In the DFDD, Attribute Concepts are classified by thematic subgroup. Click an attribute to view
+                        its datatype and listed values.
                       </p>
                     </div>
                     {selectedSubgroupAttributes.length > 6 && (
                       <Input
                         type="search"
-                        placeholder="Filtrar atributos..."
+                        placeholder="Filter attributes..."
                         value={modalAttrFilter}
                         onChange={(e) => setModalAttrFilter(e.target.value)}
                         className="h-8 text-xs sm:w-48"
@@ -1090,7 +1131,7 @@ export function GeographicDataDashboard() {
                   </div>
 
                   {filteredModalAttributes.length === 0 ? (
-                    <p className="text-xs italic text-gray-500">No hay atributos coincidentes en este subgrupo.</p>
+                    <p className="text-xs italic text-gray-500">No matching attributes in this subgroup.</p>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1">
                       {filteredModalAttributes.map((attr) => (
@@ -1111,7 +1152,7 @@ export function GeographicDataDashboard() {
                           </div>
                           <div className="text-xs font-semibold text-gray-900 mt-1 line-clamp-1">{attr.nombre}</div>
                           {attr.dominio && attr.dominio.length > 0 && (
-                            <div className="text-[11px] text-amber-800 mt-0.5">{attr.dominio.length} valores</div>
+                            <div className="text-[11px] text-amber-800 mt-0.5">{attr.dominio.length} values</div>
                           )}
                         </button>
                       ))}
@@ -1142,9 +1183,9 @@ export function GeographicDataDashboard() {
                     Short Name: {openAtributo.shortName}
                   </Badge>
                   {openAtributo.multiplicidad && (
-                    <Badge variant="outline">Multiplicidad: {openAtributo.multiplicidad}</Badge>
+                    <Badge variant="outline">Multiplicity: {openAtributo.multiplicidad}</Badge>
                   )}
-                  {openAtributo.coleccion && <Badge variant="outline">Colección: {openAtributo.coleccion}</Badge>}
+                  {openAtributo.coleccion && <Badge variant="outline">Collection: {openAtributo.coleccion}</Badge>}
                   {openAtributo.itemIdentifier && (
                     <Badge variant="outline" className="font-mono">
                       Item ID: {openAtributo.itemIdentifier}
@@ -1156,13 +1197,13 @@ export function GeographicDataDashboard() {
 
             <div className="space-y-4 mt-2">
               <div>
-                <h4 className="font-semibold text-sm text-gray-800 mb-1">Definición</h4>
+                <h4 className="font-semibold text-sm text-gray-800 mb-1">Definition</h4>
                 <p className="text-sm text-gray-700 leading-relaxed">{openAtributo.definicion}</p>
               </div>
 
               {openAtributo.descripcion && (
                 <div>
-                  <h4 className="font-semibold text-sm text-gray-800 mb-1">Descripción</h4>
+                  <h4 className="font-semibold text-sm text-gray-800 mb-1">Description</h4>
                   <p className="text-sm text-gray-700 leading-relaxed">{openAtributo.descripcion}</p>
                 </div>
               )}
@@ -1178,7 +1219,7 @@ export function GeographicDataDashboard() {
               <div className="rounded-lg border border-emerald-200 bg-emerald-50/40 p-3.5 space-y-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <h4 className="font-semibold text-sm text-emerald-950">
-                    Tipo de Dato (Datatype): <span className="font-mono">{openAtributo.tipo}</span>
+                    Datatype: <span className="font-mono">{openAtributo.tipo}</span>
                   </h4>
                   {openAtributo.tipoEspecificacion && (
                     <Badge variant="secondary" className="font-mono text-xs">
@@ -1192,41 +1233,41 @@ export function GeographicDataDashboard() {
                     <p className="font-medium text-gray-900">{openAtributo.datatype.nombre}</p>
                     {openAtributo.datatype.definicion && <p>{openAtributo.datatype.definicion}</p>}
                     {openAtributo.datatype.nota && (
-                      <p className="italic text-gray-600">Nota: {openAtributo.datatype.nota}</p>
+                      <p className="italic text-gray-600">Note: {openAtributo.datatype.nota}</p>
                     )}
 
                     <div className="flex flex-wrap gap-3 pt-1">
                       {openAtributo.datatype.longitud !== null && openAtributo.datatype.longitud !== "" && (
                         <span>
-                          <strong>Longitud máx.:</strong> {openAtributo.datatype.longitud}
+                          <strong>Max length:</strong> {openAtributo.datatype.longitud}
                         </span>
                       )}
                       {openAtributo.datatype.rangoMin && (
                         <span>
-                          <strong>Mín.:</strong> {openAtributo.datatype.rangoMin}
+                          <strong>Min:</strong> {openAtributo.datatype.rangoMin}
                         </span>
                       )}
                       {openAtributo.datatype.rangoMax && (
                         <span>
-                          <strong>Máx.:</strong> {openAtributo.datatype.rangoMax}
+                          <strong>Max:</strong> {openAtributo.datatype.rangoMax}
                         </span>
                       )}
                       {openAtributo.completa !== null && (
                         <span>
-                          <strong>Dominio completo:</strong> {openAtributo.completa ? "Sí" : "No (extensible)"}
+                          <strong>Complete domain:</strong> {openAtributo.completa ? "Yes" : "No (extensible)"}
                         </span>
                       )}
                     </div>
 
                     {openAtributo.datatype.estructura && (
                       <div className="mt-2 p-2 rounded bg-white border border-emerald-100 text-xs leading-relaxed">
-                        <strong>Estructura:</strong> {openAtributo.datatype.estructura}
+                        <strong>Structure:</strong> {openAtributo.datatype.estructura}
                       </div>
                     )}
 
                     {openAtributo.datatype.campos && openAtributo.datatype.campos.length > 0 && (
                       <div className="mt-2 space-y-1">
-                        <div className="font-semibold text-gray-800">Campos del tipo complejo:</div>
+                        <div className="font-semibold text-gray-800">Complex type fields:</div>
                         {openAtributo.datatype.campos.map((campo, idx) => (
                           <div key={idx} className="p-2 rounded bg-white border border-gray-200 text-xs">
                             <span className="font-mono font-semibold">{campo.shortName}</span> — {campo.nombre} (
@@ -1245,17 +1286,17 @@ export function GeographicDataDashboard() {
                 <div className="rounded-lg border border-blue-200 bg-blue-50/40 p-3.5 space-y-1.5 text-xs">
                   <h4 className="font-semibold text-sm text-blue-950 flex items-center gap-1.5">
                     <Ruler className="h-4 w-4" />
-                    Magnitud Física y Unidad de Medida
+                    Physical Quantity &amp; Unit of Measure
                   </h4>
                   {openAtributo.cantidadFisica && (
                     <p className="text-gray-800">
-                      <strong>Magnitud física:</strong> {openAtributo.cantidadFisica.nombre} —{" "}
+                      <strong>Physical Quantity:</strong> {openAtributo.cantidadFisica.nombre} —{" "}
                       <span className="text-gray-600">{openAtributo.cantidadFisica.definicion}</span>
                     </p>
                   )}
                   {openAtributo.unidadRecomendada && (
                     <p className="text-gray-800">
-                      <strong>Unidad recomendada:</strong> {openAtributo.unidadRecomendada.nombre} (
+                      <strong>Recommended Unit:</strong> {openAtributo.unidadRecomendada.nombre} (
                       <span className="font-mono">{openAtributo.unidadRecomendada.shortName}</span>)
                       {openAtributo.unidadRecomendada.additionalCodes && (
                         <span className="text-gray-500"> · {openAtributo.unidadRecomendada.additionalCodes}</span>
@@ -1264,7 +1305,7 @@ export function GeographicDataDashboard() {
                   )}
                   {openAtributo.unidadNoComparable && (
                     <p className="text-gray-800">
-                      <strong>Unidad no comparable:</strong> {openAtributo.unidadNoComparable}
+                      <strong>Non-comparable Unit:</strong> {openAtributo.unidadNoComparable}
                     </p>
                   )}
                 </div>
@@ -1272,7 +1313,7 @@ export function GeographicDataDashboard() {
 
               {openAtributo.additionalCodes && (
                 <div className="text-xs text-gray-700 bg-gray-50 border border-gray-200 rounded-md p-2.5">
-                  <strong>Códigos adicionales (GIFD / MGCP):</strong> {openAtributo.additionalCodes}
+                  <strong>Additional Codes (GIFD / MGCP):</strong> {openAtributo.additionalCodes}
                 </div>
               )}
 
@@ -1281,12 +1322,12 @@ export function GeographicDataDashboard() {
                 <div className="space-y-2">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <h4 className="font-semibold text-sm text-gray-800">
-                      Valores de Dominio ({openAtributo.dominio.length})
+                      Listed Values ({openAtributo.dominio.length})
                     </h4>
                     {openAtributo.dominio.length > 8 && (
                       <Input
                         type="search"
-                        placeholder="Filtrar valores de dominio..."
+                        placeholder="Filter listed values..."
                         value={domainFilter}
                         onChange={(e) => setDomainFilter(e.target.value)}
                         className="h-8 text-xs sm:w-56"
@@ -1308,7 +1349,7 @@ export function GeographicDataDashboard() {
                       </div>
                     ))}
                     {filteredDomainValues.length === 0 && (
-                      <p className="text-xs text-gray-500 text-center py-4">Sin valores coincidentes.</p>
+                      <p className="text-xs text-gray-500 text-center py-4">No matching listed values.</p>
                     )}
                   </div>
                 </div>
@@ -1317,7 +1358,7 @@ export function GeographicDataDashboard() {
               {/* Subgroups */}
               <div>
                 <h4 className="font-semibold text-sm text-gray-800 mb-1.5">
-                  Subgrupos DFDD ({openAtributo.subgrupos.length})
+                  DFDD Subgroups ({openAtributo.subgrupos.length})
                 </h4>
                 <div className="flex flex-wrap gap-1.5">
                   {openAtributo.subgrupos.map((sgCode) => {
@@ -1340,7 +1381,7 @@ export function GeographicDataDashboard() {
               <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-200">
                 {openAtributo.url && (
                   <span className="text-[11px] text-gray-500 font-mono break-all">
-                    URI histórica FAD (2014): {openAtributo.url}
+                    Historical FAD URI (2014): {openAtributo.url}
                   </span>
                 )}
                 <Button
@@ -1351,7 +1392,7 @@ export function GeographicDataDashboard() {
                   }
                 >
                   <Download className="h-3.5 w-3.5 mr-1.5" />
-                  Exportar JSON
+                  Export JSON
                 </Button>
               </div>
             </div>

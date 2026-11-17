@@ -33,7 +33,7 @@ interface SearchResultsProps {
 }
 
 const PAGE_SIZE = 24
-const SUBGRUPOS_POR_ITEM = 6
+const SUBGROUPS_PER_ITEM = 6
 
 /* ---------------------------------- Helpers --------------------------------- */
 
@@ -55,22 +55,22 @@ export function Highlight({ text, query }: { text: string; query: string }) {
 }
 
 function MatchInfo({ coincidencia, otras, query }: { coincidencia: Coincidencia; otras: Coincidencia[]; query: string }) {
-  const principales = new Set(["Nombre", "5-3-1 Code", "Código"])
-  const esPrincipal = principales.has(coincidencia.etiqueta)
-  const extras = otras.filter((o) => !principales.has(o.etiqueta))
-  const mostrar = esPrincipal ? extras.slice(0, 1) : [coincidencia]
-  if (mostrar.length === 0) return null
+  const primaryLabels = new Set(["Name", "5-3-1 Code", "Code"])
+  const isPrimary = primaryLabels.has(coincidencia.etiqueta)
+  const extras = otras.filter((o) => !primaryLabels.has(o.etiqueta))
+  const toShow = isPrimary ? extras.slice(0, 1) : [coincidencia]
+  if (toShow.length === 0) return null
 
   return (
     <div className="mt-2 space-y-1">
-      {mostrar.map((m, i) => (
+      {toShow.map((m, i) => (
         <div key={i} className="text-xs text-gray-600 leading-relaxed">
           <span className="font-semibold text-gray-700">{m.etiqueta}: </span>
           <Highlight text={makeSnippet(m.texto, query)} query={query} />
         </div>
       ))}
-      {!esPrincipal && extras.length > 1 && (
-        <div className="text-[11px] text-gray-400">+{extras.length - 1} coincidencias más</div>
+      {!isPrimary && extras.length > 1 && (
+        <div className="text-[11px] text-gray-400">+{extras.length - 1} more matches</div>
       )}
     </div>
   )
@@ -120,11 +120,11 @@ function Section({
           <Button variant="outline" size="sm" onClick={onToggle} className="bg-white">
             {expanded ? (
               <>
-                <ChevronUp className="h-4 w-4 mr-1" /> Mostrar menos
+                <ChevronUp className="h-4 w-4 mr-1" /> Show less
               </>
             ) : (
               <>
-                <ChevronDown className="h-4 w-4 mr-1" /> Mostrar todos ({count})
+                <ChevronDown className="h-4 w-4 mr-1" /> Show all ({count})
               </>
             )}
           </Button>
@@ -168,31 +168,31 @@ export function SearchResults({
       <Card className="border-2 border-dashed border-gray-300 bg-white/70">
         <CardContent className="flex flex-col items-center justify-center py-16 text-center">
           <SearchX className="h-12 w-12 text-gray-400 mb-4" />
-          <p className="text-lg font-semibold text-gray-700">No se encontraron resultados</p>
+          <p className="text-lg font-semibold text-gray-700">No results found</p>
           <p className="text-sm text-gray-500 mt-1">
-            Probá con otro término para &quot;<span className="font-medium">{rawQuery}</span>&quot;.
+            Try another search term for &quot;<span className="font-medium">{rawQuery}</span>&quot;.
           </p>
         </CardContent>
       </Card>
     )
   }
 
-  const resumen = [
-    { id: "res-grupos", label: "Grupos", count: results.categorias.length },
-    { id: "res-subgrupos", label: "Subgrupos", count: results.subcategorias.length },
-    { id: "res-objetos", label: "Feature Concepts", count: results.objetos.length },
-    { id: "res-atributos", label: "Attribute Concepts", count: results.atributos.length },
+  const summary = [
+    { id: "res-groups", label: "Groups", count: results.categorias.length },
+    { id: "res-subgroups", label: "Subgroups", count: results.subcategorias.length },
+    { id: "res-objects", label: "Feature Concepts", count: results.objetos.length },
+    { id: "res-attributes", label: "Attribute Concepts", count: results.atributos.length },
   ]
 
   return (
     <div className="space-y-8">
-      {/* Resumen */}
+      {/* Summary */}
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-sm text-gray-700 mr-2">
-          <span className="font-semibold">{results.total}</span> resultados para &quot;
+          <span className="font-semibold">{results.total}</span> results for &quot;
           <span className="font-semibold">{rawQuery}</span>&quot;
         </p>
-        {resumen
+        {summary
           .filter((r) => r.count > 0)
           .map((r) => (
             <button
@@ -206,10 +206,10 @@ export function SearchResults({
           ))}
       </div>
 
-      {/* Grupos */}
+      {/* Groups */}
       <Section
-        id="res-grupos"
-        title="Grupos (Groups)"
+        id="res-groups"
+        title="Groups"
         count={results.categorias.length}
         icon={Database}
         expanded={expandedSections.has("categorias")}
@@ -251,10 +251,10 @@ export function SearchResults({
         </div>
       </Section>
 
-      {/* Subgrupos */}
+      {/* Subgroups */}
       <Section
-        id="res-subgrupos"
-        title="Subgrupos (Subgroups)"
+        id="res-subgroups"
+        title="Subgroups"
         count={results.subcategorias.length}
         icon={Layers}
         expanded={expandedSections.has("subcategorias")}
@@ -284,7 +284,7 @@ export function SearchResults({
                         <Highlight text={hit.subcategoria.codigo} query={q} />
                       </Badge>
                       <span className="text-xs opacity-80">
-                        {hit.subcategoria.objetos.length} OG · {hit.subcategoria.atributosCodigos.length} atrib.
+                        {hit.subcategoria.objetos.length} FC · {hit.subcategoria.atributosCodigos.length} attr.
                       </span>
                     </div>
                   </div>
@@ -298,8 +298,8 @@ export function SearchResults({
 
       {/* Feature Concepts */}
       <Section
-        id="res-objetos"
-        title="Objetos Geográficos (Feature Concepts)"
+        id="res-objects"
+        title="Feature Concepts"
         count={results.objetos.length}
         icon={MapPin}
         expanded={expandedSections.has("objetos")}
@@ -331,18 +331,16 @@ export function SearchResults({
                     <Badge variant="secondary" className="text-xs font-mono">
                       <Highlight text={hit.objeto.shortName} query={q} />
                     </Badge>
-                    {hit.refs.length > 1 && (
-                      <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 text-[11px]">
-                        {hit.refs.length} subgrupos
-                      </Badge>
-                    )}
+                    <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 text-[11px]">
+                      {hit.refs.length} {hit.refs.length === 1 ? "subgroup" : "subgroups"}
+                    </Badge>
                   </div>
                   <CardTitle className="text-base leading-tight mt-2">
                     <Highlight text={hit.objeto.nombre} query={q} />
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  {hit.coincidencia.etiqueta !== "Definición" && hit.objeto.definicion && (
+                  {hit.coincidencia.etiqueta !== "Definition" && hit.objeto.definicion && (
                     <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">{hit.objeto.definicion}</p>
                   )}
                   <MatchInfo coincidencia={hit.coincidencia} otras={hit.otras} query={q} />
@@ -373,8 +371,8 @@ export function SearchResults({
 
       {/* Attribute Concepts */}
       <Section
-        id="res-atributos"
-        title="Atributos (Attribute Concepts)"
+        id="res-attributes"
+        title="Attribute Concepts"
         count={results.atributos.length}
         icon={FileText}
         expanded={expandedSections.has("atributos")}
@@ -382,8 +380,8 @@ export function SearchResults({
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {limit(results.atributos, "atributos").map((hit) => {
-            const abierto = expandedAtributos.has(hit.codigo)
-            const subgrupos = abierto ? hit.subgrupos : hit.subgrupos.slice(0, SUBGRUPOS_POR_ITEM)
+            const open = expandedAtributos.has(hit.codigo)
+            const subgrupos = open ? hit.subgrupos : hit.subgrupos.slice(0, SUBGROUPS_PER_ITEM)
             return (
               <Card
                 key={hit.key}
@@ -410,7 +408,7 @@ export function SearchResults({
                         )}
                         {hit.detalle.dominio && hit.detalle.dominio.length > 0 && (
                           <Badge className="bg-amber-100 text-amber-900 hover:bg-amber-100 text-xs">
-                            {hit.detalle.dominio.length} valores
+                            {hit.detalle.dominio.length} values
                           </Badge>
                         )}
                       </div>
@@ -421,23 +419,23 @@ export function SearchResults({
                       className="shrink-0 text-xs"
                       onClick={() => onSelectAtributo(hit.detalle, hit.subgrupos[0])}
                     >
-                      Ver detalle
+                      View specification
                     </Button>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  {hit.detalle.definicion && hit.coincidencia.etiqueta !== "Definición" && (
+                  {hit.detalle.definicion && hit.coincidencia.etiqueta !== "Definition" && (
                     <p className="text-xs text-gray-600 leading-relaxed line-clamp-2">{hit.detalle.definicion}</p>
                   )}
                   <MatchInfo coincidencia={hit.coincidencia} otras={hit.otras} query={q} />
 
                   <div className="mt-3 border-t border-gray-100 pt-3">
                     {hit.subgrupos.length === 0 ? (
-                      <p className="text-xs italic text-gray-400">Sin subgrupos asignados.</p>
+                      <p className="text-xs italic text-gray-400">No subgroups assigned.</p>
                     ) : (
                       <>
                         <p className="text-xs font-semibold text-gray-700 mb-2">
-                          Clasificado en {hit.subgrupos.length} subgrupo{hit.subgrupos.length !== 1 ? "s" : ""}:
+                          Classified in {hit.subgrupos.length} subgroup{hit.subgrupos.length !== 1 ? "s" : ""}:
                         </p>
                         <div className="flex flex-wrap gap-1.5">
                           {subgrupos.map((sg) => (
@@ -451,13 +449,13 @@ export function SearchResults({
                               {sg.subcategoria.codigo} · {sg.subcategoria.nombre}
                             </button>
                           ))}
-                          {hit.subgrupos.length > SUBGRUPOS_POR_ITEM && (
+                          {hit.subgrupos.length > SUBGROUPS_PER_ITEM && (
                             <button
                               type="button"
                               onClick={() => toggle(setExpandedAtributos, hit.codigo)}
                               className="rounded-md px-2 py-1 text-xs font-medium text-gray-600 hover:text-gray-900"
                             >
-                              {abierto ? "Ver menos" : `+${hit.subgrupos.length - SUBGRUPOS_POR_ITEM} más`}
+                              {open ? "Show less" : `+${hit.subgrupos.length - SUBGROUPS_PER_ITEM} more`}
                             </button>
                           )}
                         </div>
