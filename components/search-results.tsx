@@ -37,7 +37,7 @@ const SUBGROUPS_PER_ITEM = 6
 
 /* ---------------------------------- Helpers --------------------------------- */
 
-export function Highlight({ text, query }: { text: string; query: string }) {
+export function Highlight({ text, query }: { text: string; query: string | string[] }) {
   const segments = getHighlightSegments(text, query)
   return (
     <>
@@ -54,7 +54,15 @@ export function Highlight({ text, query }: { text: string; query: string }) {
   )
 }
 
-function MatchInfo({ coincidencia, otras, query }: { coincidencia: Coincidencia; otras: Coincidencia[]; query: string }) {
+function MatchInfo({
+  coincidencia,
+  otras,
+  query,
+}: {
+  coincidencia: Coincidencia
+  otras: Coincidencia[]
+  query: string | string[]
+}) {
   const primaryLabels = new Set(["Name", "5-3-1 Code", "Code"])
   const isPrimary = primaryLabels.has(coincidencia.etiqueta)
   const extras = otras.filter((o) => !primaryLabels.has(o.etiqueta))
@@ -161,7 +169,7 @@ export function SearchResults({
     })
 
   const limit = <T,>(items: T[], key: string) => (expandedSections.has(key) ? items : items.slice(0, PAGE_SIZE))
-  const q = rawQuery
+  const q: string[] = [rawQuery, ...results.translatedTerms]
 
   if (results.total === 0) {
     return (
@@ -172,6 +180,11 @@ export function SearchResults({
           <p className="text-sm text-gray-500 mt-1">
             Try another search term for &quot;<span className="font-medium">{rawQuery}</span>&quot;.
           </p>
+          {results.translatedTerms.length > 0 && (
+            <p className="text-xs text-gray-400 mt-2">
+              Spanish → English terms checked: {results.translatedTerms.join(", ")}
+            </p>
+          )}
         </CardContent>
       </Card>
     )
@@ -187,23 +200,37 @@ export function SearchResults({
   return (
     <div className="space-y-8">
       {/* Summary */}
-      <div className="flex flex-wrap items-center gap-2">
-        <p className="text-sm text-gray-700 mr-2">
-          <span className="font-semibold">{results.total}</span> results for &quot;
-          <span className="font-semibold">{rawQuery}</span>&quot;
-        </p>
-        {summary
-          .filter((r) => r.count > 0)
-          .map((r) => (
-            <button
-              key={r.id}
-              type="button"
-              onClick={() => document.getElementById(r.id)?.scrollIntoView({ behavior: "smooth", block: "start" })}
-              className="rounded-full border border-emerald-200 bg-white px-3 py-1 text-xs font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
-            >
-              {r.label} · {r.count}
-            </button>
-          ))}
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-sm text-gray-700 mr-2">
+            <span className="font-semibold">{results.total}</span> results for &quot;
+            <span className="font-semibold">{rawQuery}</span>&quot;
+          </p>
+          {summary
+            .filter((r) => r.count > 0)
+            .map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => document.getElementById(r.id)?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                className="rounded-full border border-emerald-200 bg-white px-3 py-1 text-xs font-medium text-emerald-800 transition-colors hover:bg-emerald-50"
+              >
+                {r.label} · {r.count}
+              </button>
+            ))}
+        </div>
+
+        {results.translatedTerms.length > 0 && (
+          <div className="inline-flex flex-wrap items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50/70 px-3 py-1.5 text-xs text-emerald-900">
+            <span className="font-semibold">Spanish → English:</span>
+            <span>&quot;{rawQuery}&quot; →</span>
+            {results.translatedTerms.map((term) => (
+              <Badge key={term} variant="outline" className="bg-white border-emerald-300 text-emerald-800 font-mono text-[11px]">
+                {term}
+              </Badge>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Groups */}

@@ -98,18 +98,21 @@ El archivo [catalog-types.ts](file:///C:/Users/feder/OneDrive/Documentos/GitHub/
 ### 5.1. Hook `useDebounce` ([use-debounce.ts](file:///C:/Users/feder/OneDrive/Documentos/GitHub/DFDD/hooks/use-debounce.ts))
 Se implementó exactamente según `GUIA_REPLICACION_COG.md` §4.1 con retardo configurable (`200 ms`) aplicado al término de búsqueda en el dashboard.
 
-### 5.2. Utilidades e Índice de Búsqueda ([search-utils.tsx](file:///C:/Users/feder/OneDrive/Documentos/GitHub/DFDD/lib/search-utils.tsx))
-Se consolidó la lógica en `lib/search-utils.tsx` (reemplazando al anterior `lib/search-utils.ts`):
-- `normalize()`, `getHighlightSegments()`, `highlight()`, `makeSnippet()` y `getObjectSlug()`.
+### 5.2. Glosario Bilingüe Español → Inglés ([es-en-glossary.ts](file:///C:/Users/feder/OneDrive/Documentos/GitHub/DFDD/lib/es-en-glossary.ts)) e Índice ([search-utils.tsx](file:///C:/Users/feder/OneDrive/Documentos/GitHub/DFDD/lib/search-utils.tsx))
+Se incorporó `expandBilingualQuery()` con un glosario geoespacial Español → Inglés adaptado al vocabulario DFDD (frases compuestas como `"pista de aterrizaje"` → `runway`, términos simples como `"puente"` → `bridge` / `overpass` / `underbridge`, y reducción básica de plurales/género en español).
+
+En `lib/search-utils.tsx` (que reemplazó al anterior `lib/search-utils.ts`):
+- `normalize()`, `getHighlightSegments()` (resaltado simultáneo de múltiples términos traducidos), `highlight()`, `makeSnippet()`, `getObjectSlug()` y `matchesBilingualFields()` (para los filtros locales por subgrupo y dominio).
 - `buildSearchIndex(data, atributosDetalle)`:
   - Indexa los **14 Grupos** y **82 Subgrupos** (por código, `alphaCode`, nombre, definición y descripción).
   - Deduplica los **935 Feature Concepts** por su `5-3-1 Code` (evitando resultados repetidos cuando un concepto aparece en múltiples subgrupos) y almacena todas sus referencias en `refs: ObjetoRef[]`.
-  - Indexa los **1.774 Attribute Concepts** por `5-3-1 Code`, `shortName`, nombre, alias, tipo/datatype, magnitud física, unidad recomendada, códigos adicionales y **todos sus valores de dominio**.
-- `searchIndex(index, query)`: calcula relevancia ponderada (`score`) cuando `q.length >= 2`.
+  - Indexa los **1,774 Attribute Concepts** por `5-3-1 Code`, `shortName`, nombre, alias, tipo/datatype, magnitud física, unidad recomendada, códigos adicionales y **todos sus valores de dominio**.
+- `searchIndex(index, query)`: evalúa coincidencia directa en inglés/código y expansión bilingüe (`AND` entre términos, `OR` entre sinónimos, con límite de palabra para términos cortos traducidos) calculando relevancia ponderada (`score`).
 
 ### 5.3. Vista de Resultados ([search-results.tsx](file:///C:/Users/feder/OneDrive/Documentos/GitHub/DFDD/components/search-results.tsx))
 Adaptada para mostrar:
-- Conteo total y pills de salto rápido a **Grupos**, **Subgrupos**, **Feature Concepts** y **Attribute Concepts**.
+- Indicador de traducción activa (`Spanish → English`) cuando la consulta ingresada fue expandida desde español, resaltando los términos ingleses coincidentes en las tarjetas.
+- Conteo total y pills de salto rápido a **Groups**, **Subgroups**, **Feature Concepts** y **Attribute Concepts**.
 - Tarjetas de **Feature Concepts** deduplicadas con chips interactivos de cada subgrupo al que pertenece el concepto.
 - Tarjetas de **Attribute Concepts** con badges de datatype, unidad recomendada, cantidad de valores de dominio, subgrupos clickeables y botón directo `"Ver detalle"` que abre el modal de especificación del atributo.
 

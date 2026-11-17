@@ -45,7 +45,7 @@ import { useDebounce } from "@/hooks/use-debounce"
 import {
   buildSearchIndex,
   getObjectSlug,
-  normalize,
+  matchesBilingualFields,
   searchIndex,
   type ObjetoRef,
   type SubgrupoRef,
@@ -338,51 +338,31 @@ export function GeographicDataDashboard() {
 
   const filteredSubgroupObjects = useMemo(() => {
     if (!selectedSubcategory) return []
-    const q = normalize(subgroupFilter).trim()
-    if (!q) return selectedSubcategory.objetos
-    return selectedSubcategory.objetos.filter(
-      (o) =>
-        normalize(o.nombre).includes(q) ||
-        normalize(o.codigo).includes(q) ||
-        normalize(o.shortName).includes(q) ||
-        normalize(o.definicion).includes(q),
+    if (!subgroupFilter.trim()) return selectedSubcategory.objetos
+    return selectedSubcategory.objetos.filter((o) =>
+      matchesBilingualFields([o.nombre, o.codigo, o.shortName, o.aliases, o.definicion], subgroupFilter),
     )
   }, [selectedSubcategory, subgroupFilter])
 
   const filteredSubgroupAttributes = useMemo(() => {
-    const q = normalize(subgroupFilter).trim()
-    if (!q) return selectedSubgroupAttributes
-    return selectedSubgroupAttributes.filter(
-      (a) =>
-        normalize(a.nombre).includes(q) ||
-        normalize(a.codigo).includes(q) ||
-        normalize(a.shortName).includes(q) ||
-        normalize(a.tipo).includes(q) ||
-        normalize(a.definicion).includes(q),
+    if (!subgroupFilter.trim()) return selectedSubgroupAttributes
+    return selectedSubgroupAttributes.filter((a) =>
+      matchesBilingualFields([a.nombre, a.codigo, a.shortName, a.tipo, a.definicion], subgroupFilter),
     )
   }, [selectedSubgroupAttributes, subgroupFilter])
 
   const filteredModalAttributes = useMemo(() => {
-    const q = normalize(modalAttrFilter).trim()
-    if (!q) return selectedSubgroupAttributes
-    return selectedSubgroupAttributes.filter(
-      (a) =>
-        normalize(a.nombre).includes(q) ||
-        normalize(a.codigo).includes(q) ||
-        normalize(a.tipo).includes(q),
+    if (!modalAttrFilter.trim()) return selectedSubgroupAttributes
+    return selectedSubgroupAttributes.filter((a) =>
+      matchesBilingualFields([a.nombre, a.codigo, a.tipo, a.definicion], modalAttrFilter),
     )
   }, [selectedSubgroupAttributes, modalAttrFilter])
 
   const filteredDomainValues = useMemo(() => {
     if (!openAtributo?.dominio) return []
-    const q = normalize(domainFilter).trim()
-    if (!q) return openAtributo.dominio
-    return openAtributo.dominio.filter(
-      (v) =>
-        normalize(v.codigo).includes(q) ||
-        normalize(v.etiqueta).includes(q) ||
-        normalize(v.shortName).includes(q) ||
-        normalize(v.definicion).includes(q),
+    if (!domainFilter.trim()) return openAtributo.dominio
+    return openAtributo.dominio.filter((v) =>
+      matchesBilingualFields([v.codigo, v.etiqueta, v.shortName, v.definicion], domainFilter),
     )
   }, [openAtributo, domainFilter])
 
@@ -577,8 +557,8 @@ export function GeographicDataDashboard() {
               <Input
                 id="global-search-input"
                 type="search"
-                aria-label="Search the DFDD"
-                placeholder="Search groups, subgroups, feature concepts (e.g. FA005, Bridge), attributes, or listed values..."
+                aria-label="Search the DFDD in English or Spanish"
+                placeholder="Search in English or Spanish (e.g. bridge, puente, FA005, runway, altura)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={(e) => e.key === "Escape" && setSearchTerm("")}
